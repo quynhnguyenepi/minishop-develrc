@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All products | Mini Shop QA</title>
+<link rel="icon" href="data:,">
+<script>
+/* QA hook: push the "segment" user attribute BEFORE the Optimizely snippet runs.
+   ?segment=vip sets it (stored in a cookie), ?segment=clear removes it. */
+(function () {
+  try {
+    var m, seg = new URLSearchParams(location.search).get('segment');
+    if (seg === 'clear') { document.cookie = 'qa_segment=;path=/;max-age=0'; seg = null; }
+    else if (seg) { document.cookie = 'qa_segment=' + encodeURIComponent(seg) + ';path=/;max-age=86400'; }
+    else if ((m = document.cookie.match(/(?:^|; )qa_segment=([^;]*)/))) { seg = decodeURIComponent(m[1]); }
+    window.optimizely = window.optimizely || [];
+    if (seg) { window.optimizely.push({ type: 'user', attributes: { segment: seg } }); }
+  } catch (e) {}
+})();
+</script>
+<!-- OPTIMIZELY SNIPPET: synchronous, first blocking script after the attribute hook.
+     Verify the URL in Project Settings > Implementation and replace if different. -->
+<script src="https://optimizely-staging.s3.amazonaws.com/js/5185974816735232.js"></script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="category" data-root="">
+<div class="promo-bar" data-qa="promo-bar">Free shipping on orders over $100 &middot; Demo store for QA testing</div>
+<header class="site-header">
+  <div class="container header-row">
+    <a id="site-logo" class="logo" href="index.html">Mini<span>Shop</span></a>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">Menu</button>
+    <nav id="main-nav" class="main-nav" aria-label="Main">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li class="has-mega">
+          <a href="category.html" aria-haspopup="true">Shop</a>
+          <div class="mega" data-qa="mega-menu">
+            <div class="mega-col"><h3>Shoes</h3><ul><li><a href="product/shoes-1.html">Runner Pro 1</a></li><li><a href="product/shoes-2.html">Court Classic 2</a></li><li><a href="product/shoes-10.html">Street High 10</a></li></ul></div><div class="mega-col"><h3>Bags</h3><ul><li><a href="product/bag-1.html">Quilted Crossbody</a></li><li><a href="product/bag-2.html">Leather Satchel</a></li></ul></div><div class="mega-col"><h3>Hats</h3><ul><li><a href="product/hat-1.html">NYC Baseball Cap</a></li></ul></div>
+          </div>
+        </li>
+        <li><a href="cart.html" data-qa="cart-link">Cart (<span id="cart-count" data-qa="cart-count">0</span>)</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="container section">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a> / <span>All products</span></nav>
+  <h1>All products</h1>
+  <div class="toolbar">
+    <div class="chips" role="group" aria-label="Filter by category">
+      <button type="button" class="chip is-active" data-filter="all">All</button>
+      <button type="button" class="chip" data-filter="shoes">Shoes</button>
+      <button type="button" class="chip" data-filter="bags">Bags</button>
+      <button type="button" class="chip" data-filter="hats">Hats</button>
+    </div>
+    <label class="sort">Sort by
+      <select id="sort" data-qa="sort">
+        <option value="featured">Featured</option>
+        <option value="price-asc">Price: low to high</option>
+        <option value="price-desc">Price: high to low</option>
+      </select>
+    </label>
+  </div>
+  <ul class="grid grid-3" id="product-grid">
+<li class="card card_m3p9w" data-cat="shoes" data-price="89.00" data-sku="SHOE-001">
+  <a class="card-link" href="product/shoes-1.html">
+    <img src="assets/Shoes1.jpg" alt="Runner Pro 1" width="320" height="240">
+    <h3 class="card-title title_x81kd">Runner Pro 1</h3>
+  </a>
+  <p class="card-price">$89.00</p>
+</li>
+<li class="card card_m3p9w" data-cat="shoes" data-price="79.00" data-sku="SHOE-002">
+  <a class="card-link" href="product/shoes-2.html">
+    <img src="assets/Shoes2.jpeg" alt="Court Classic 2" width="320" height="240">
+    <h3 class="card-title title_x81kd">Court Classic 2</h3>
+  </a>
+  <p class="card-price">$79.00</p>
+</li>
+<li class="card card_m3p9w" data-cat="shoes" data-price="129.00" data-sku="SHOE-010">
+  <a class="card-link" href="product/shoes-10.html">
+    <img src="assets/Shoes3.jpeg" alt="Street High 10" width="320" height="240">
+    <h3 class="card-title title_x81kd">Street High 10</h3>
+  </a>
+  <p class="card-price">$129.00</p>
+</li>
+<li class="card card_m3p9w" data-cat="bags" data-price="65.00" data-sku="BAG-001">
+  <a class="card-link" href="product/bag-1.html">
+    <img src="assets/Bag1.jpeg" alt="Quilted Crossbody" width="320" height="240">
+    <h3 class="card-title title_x81kd">Quilted Crossbody</h3>
+  </a>
+  <p class="card-price">$65.00</p>
+</li>
+<li class="card card_m3p9w" data-cat="bags" data-price="95.00" data-sku="BAG-002">
+  <a class="card-link" href="product/bag-2.html">
+    <img src="assets/Bag2.png" alt="Leather Satchel" width="320" height="240">
+    <h3 class="card-title title_x81kd">Leather Satchel</h3>
+  </a>
+  <p class="card-price">$95.00</p>
+</li>
+<li class="card card_m3p9w" data-cat="hats" data-price="24.00" data-sku="HAT-001">
+  <a class="card-link" href="product/hat-1.html">
+    <img src="assets/Hat1.jpg" alt="NYC Baseball Cap" width="320" height="240">
+    <h3 class="card-title title_x81kd">NYC Baseball Cap</h3>
+  </a>
+  <p class="card-price">$24.00</p>
+</li>
+  </ul>
+  <div id="recs-slot" data-root="" data-current=""></div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><h4>Mini Shop QA</h4><p>A demo storefront for QA Agent testing. No real orders and no real payments.</p></div>
+    <div><h4>Pages</h4><ul>
+      <li><a href="cart.html">Cart</a></li>
+      <li><a href="cart-recovery.html">Saved cart</a></li>
+      <li><a href="checkout.html">Checkout</a></li></ul></div>
+    <div><h4>Newsletter</h4>
+      <form id="newsletter-form" class="newsletter" novalidate>
+        <label for="newsletter-email">Email address</label>
+        <input id="newsletter-email" name="email" type="email" placeholder="you@example.com" autocomplete="off">
+        <button type="submit" class="btn btn-secondary" data-qa="newsletter-submit">Subscribe</button>
+        <p id="newsletter-msg" class="form-msg" role="status" aria-live="polite"></p>
+      </form></div>
+  </div>
+  <p class="container debug" id="debug-attrs" data-qa="debug-attrs"></p>
+</footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="assets/shop.js"></script>
+</body>
+</html>

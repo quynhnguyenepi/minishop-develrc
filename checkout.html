@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout | Mini Shop QA</title>
+<link rel="icon" href="data:,">
+<script>
+/* QA hook: push the "segment" user attribute BEFORE the Optimizely snippet runs.
+   ?segment=vip sets it (stored in a cookie), ?segment=clear removes it. */
+(function () {
+  try {
+    var m, seg = new URLSearchParams(location.search).get('segment');
+    if (seg === 'clear') { document.cookie = 'qa_segment=;path=/;max-age=0'; seg = null; }
+    else if (seg) { document.cookie = 'qa_segment=' + encodeURIComponent(seg) + ';path=/;max-age=86400'; }
+    else if ((m = document.cookie.match(/(?:^|; )qa_segment=([^;]*)/))) { seg = decodeURIComponent(m[1]); }
+    window.optimizely = window.optimizely || [];
+    if (seg) { window.optimizely.push({ type: 'user', attributes: { segment: seg } }); }
+  } catch (e) {}
+})();
+</script>
+<!-- OPTIMIZELY SNIPPET: synchronous, first blocking script after the attribute hook.
+     Verify the URL in Project Settings > Implementation and replace if different. -->
+<script src="https://optimizely-staging.s3.amazonaws.com/js/5185974816735232.js"></script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="checkout" data-root="">
+<div class="promo-bar" data-qa="promo-bar">Free shipping on orders over $100 &middot; Demo store for QA testing</div>
+<header class="site-header">
+  <div class="container header-row">
+    <a id="site-logo" class="logo" href="index.html">Mini<span>Shop</span></a>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">Menu</button>
+    <nav id="main-nav" class="main-nav" aria-label="Main">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li class="has-mega">
+          <a href="category.html" aria-haspopup="true">Shop</a>
+          <div class="mega" data-qa="mega-menu">
+            <div class="mega-col"><h3>Shoes</h3><ul><li><a href="product/shoes-1.html">Runner Pro 1</a></li><li><a href="product/shoes-2.html">Court Classic 2</a></li><li><a href="product/shoes-10.html">Street High 10</a></li></ul></div><div class="mega-col"><h3>Bags</h3><ul><li><a href="product/bag-1.html">Quilted Crossbody</a></li><li><a href="product/bag-2.html">Leather Satchel</a></li></ul></div><div class="mega-col"><h3>Hats</h3><ul><li><a href="product/hat-1.html">NYC Baseball Cap</a></li></ul></div>
+          </div>
+        </li>
+        <li><a href="cart.html" data-qa="cart-link">Cart (<span id="cart-count" data-qa="cart-count">0</span>)</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="container section">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a> / <a href="cart.html">Cart</a> / <span>Checkout</span></nav>
+  <h1>Checkout</h1>
+  <p class="hint">Demo checkout: nothing is sent or charged. Do not enter real personal data.</p>
+  <div class="checkout-layout" id="checkout-layout">
+    <form id="checkout-form" class="form" novalidate data-qa="checkout-form">
+      <div class="field"><label for="co-name">Full name</label>
+        <input id="co-name" name="name" type="text" autocomplete="off"><span class="field-error" id="co-name-error" role="alert"></span></div>
+      <div class="field"><label for="co-email">Email</label>
+        <input id="co-email" name="email" type="email" autocomplete="off"><span class="field-error" id="co-email-error" role="alert"></span></div>
+      <div class="field"><label for="co-address">Address</label>
+        <input id="co-address" name="address" type="text" autocomplete="off"><span class="field-error" id="co-address-error" role="alert"></span></div>
+      <div class="field"><label for="co-city">City</label>
+        <input id="co-city" name="city" type="text" autocomplete="off"><span class="field-error" id="co-city-error" role="alert"></span></div>
+      <div class="field"><label for="co-country">Country</label>
+        <select id="co-country" name="country"><option>Vietnam</option><option>United States</option><option>United Kingdom</option></select></div>
+      <fieldset class="field"><legend>Payment method</legend>
+        <label class="radio"><input type="radio" name="pay" value="cod" checked> Cash on delivery (demo)</label>
+        <label class="radio"><input type="radio" name="pay" value="card"> Card (demo, no payment taken)</label>
+      </fieldset>
+      <p id="checkout-msg" class="form-msg" role="status" aria-live="polite"></p>
+      <button type="submit" class="btn btn-primary btn-lg" id="place-order" data-qa="place-order">Place demo order</button>
+    </form>
+    <aside class="order-summary" id="order-summary" data-qa="order-summary" aria-label="Order summary"></aside>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><h4>Mini Shop QA</h4><p>A demo storefront for QA Agent testing. No real orders and no real payments.</p></div>
+    <div><h4>Pages</h4><ul>
+      <li><a href="cart.html">Cart</a></li>
+      <li><a href="cart-recovery.html">Saved cart</a></li>
+      <li><a href="checkout.html">Checkout</a></li></ul></div>
+    <div><h4>Newsletter</h4>
+      <form id="newsletter-form" class="newsletter" novalidate>
+        <label for="newsletter-email">Email address</label>
+        <input id="newsletter-email" name="email" type="email" placeholder="you@example.com" autocomplete="off">
+        <button type="submit" class="btn btn-secondary" data-qa="newsletter-submit">Subscribe</button>
+        <p id="newsletter-msg" class="form-msg" role="status" aria-live="polite"></p>
+      </form></div>
+  </div>
+  <p class="container debug" id="debug-attrs" data-qa="debug-attrs"></p>
+</footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="assets/shop.js"></script>
+</body>
+</html>

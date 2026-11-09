@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Street High 10 | Mini Shop QA</title>
+<link rel="icon" href="data:,">
+<script>
+/* QA hook: push the "segment" user attribute BEFORE the Optimizely snippet runs.
+   ?segment=vip sets it (stored in a cookie), ?segment=clear removes it. */
+(function () {
+  try {
+    var m, seg = new URLSearchParams(location.search).get('segment');
+    if (seg === 'clear') { document.cookie = 'qa_segment=;path=/;max-age=0'; seg = null; }
+    else if (seg) { document.cookie = 'qa_segment=' + encodeURIComponent(seg) + ';path=/;max-age=86400'; }
+    else if ((m = document.cookie.match(/(?:^|; )qa_segment=([^;]*)/))) { seg = decodeURIComponent(m[1]); }
+    window.optimizely = window.optimizely || [];
+    if (seg) { window.optimizely.push({ type: 'user', attributes: { segment: seg } }); }
+  } catch (e) {}
+})();
+</script>
+<!-- OPTIMIZELY SNIPPET: synchronous, first blocking script after the attribute hook.
+     Verify the URL in Project Settings > Implementation and replace if different. -->
+<script src="https://optimizely-staging.s3.amazonaws.com/js/5185974816735232.js"></script>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-page="product" data-root="../" data-sku="SHOE-010">
+<div class="promo-bar" data-qa="promo-bar">Free shipping on orders over $100 &middot; Demo store for QA testing</div>
+<header class="site-header">
+  <div class="container header-row">
+    <a id="site-logo" class="logo" href="../index.html">Mini<span>Shop</span></a>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">Menu</button>
+    <nav id="main-nav" class="main-nav" aria-label="Main">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li class="has-mega">
+          <a href="../category.html" aria-haspopup="true">Shop</a>
+          <div class="mega" data-qa="mega-menu">
+            <div class="mega-col"><h3>Shoes</h3><ul><li><a href="../product/shoes-1.html">Runner Pro 1</a></li><li><a href="../product/shoes-2.html">Court Classic 2</a></li><li><a href="../product/shoes-10.html">Street High 10</a></li></ul></div><div class="mega-col"><h3>Bags</h3><ul><li><a href="../product/bag-1.html">Quilted Crossbody</a></li><li><a href="../product/bag-2.html">Leather Satchel</a></li></ul></div><div class="mega-col"><h3>Hats</h3><ul><li><a href="../product/hat-1.html">NYC Baseball Cap</a></li></ul></div>
+          </div>
+        </li>
+        <li><a href="../cart.html" data-qa="cart-link">Cart (<span id="cart-count" data-qa="cart-count">0</span>)</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="container section">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="../index.html">Home</a> / <a href="../category.html">All products</a> / <span>Street High 10</span></nav>
+  <div class="pdp">
+    <div class="pdp-media"><img src="../assets/Shoes3.jpeg" alt="Street High 10" width="480" height="360"></div>
+    <div class="pdp-info">
+      <h1 class="pdp-title title_x81kd" data-qa="product-title">Street High 10</h1>
+      <p class="sku">SKU SHOE-010</p>
+      <p class="pdp-price"><span class="price price__7hq2z" data-qa="price">$129.00</span></p>
+      <p class="rating" aria-label="Rated 4.6 out of 5">&#9733;&#9733;&#9733;&#9733;&#9734; 4.6 (128 reviews)</p>
+      <p>High-top street sneaker with a padded collar and contrast leather panels.</p>
+      <fieldset class="opt"><legend>Colour: <span id="color-label">Black</span></legend>
+        <button type="button" class="swatch swatch--black is-selected" data-color="black" aria-pressed="true" aria-label="Black"></button>
+        <button type="button" class="swatch swatch--red" data-color="red" aria-pressed="false" aria-label="Red"></button>
+        <button type="button" class="swatch swatch--blue" data-color="blue" aria-pressed="false" aria-label="Blue"></button>
+      </fieldset>
+      <div class="opt-row">
+        <label for="size">Size</label>
+        <select id="size" data-qa="size"><option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option></select>
+        <a class="size-guide desktop-only" href="#size-guide" data-qa="size-guide">Size guide</a>
+      </div>
+      <div class="opt-row">
+        <label for="qty">Quantity</label>
+        <input id="qty" type="number" min="1" max="9" value="1" data-qa="qty">
+      </div>
+      <button type="button" class="btn btn-primary btn-lg btn_a3f9x" id="add-to-cart" data-qa="add-to-cart">Add to cart</button>
+      <a class="btn btn-ghost" href="../cart.html">Go to cart</a>
+    </div>
+  </div>
+  <section class="accordions" aria-label="Product details">
+    <details class="acc" open><summary>Description</summary><p>High-top street sneaker with a padded collar and contrast leather panels. Designed in the Alps, tested in the Arctic. This is demo copy used by QA experiments to check text replacement.</p></details>
+    <details class="acc"><summary>Specifications</summary><ul><li>Material: recycled textile</li><li>Weight: 340 g</li><li>Care: wipe clean</li><li>Origin: Vietnam</li></ul></details>
+    <details class="acc" id="size-guide"><summary>Shipping &amp; returns</summary><p>Free standard shipping over $100. Returns accepted within 30 days in original condition.</p></details>
+    <details class="acc"><summary>Reviews</summary><ul class="reviews"><li><strong>Anna</strong> &mdash; Great value, would buy again.</li><li><strong>Linh</strong> &mdash; Fits as expected.</li><li><strong>Marc</strong> &mdash; Colour is slightly different from the photo.</li></ul></details>
+  </section>
+  <div id="recs-slot" data-root="../" data-current="SHOE-010"></div>
+  <div class="sticky-atc mobile-only" data-qa="sticky-bar">
+    <span class="sticky-name">Street High 10 &middot; $129.00</span>
+    <button type="button" class="btn btn-primary" id="sticky-atc" data-qa="sticky-add-to-cart">Add to cart</button>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><h4>Mini Shop QA</h4><p>A demo storefront for QA Agent testing. No real orders and no real payments.</p></div>
+    <div><h4>Pages</h4><ul>
+      <li><a href="../cart.html">Cart</a></li>
+      <li><a href="../cart-recovery.html">Saved cart</a></li>
+      <li><a href="../checkout.html">Checkout</a></li></ul></div>
+    <div><h4>Newsletter</h4>
+      <form id="newsletter-form" class="newsletter" novalidate>
+        <label for="newsletter-email">Email address</label>
+        <input id="newsletter-email" name="email" type="email" placeholder="you@example.com" autocomplete="off">
+        <button type="submit" class="btn btn-secondary" data-qa="newsletter-submit">Subscribe</button>
+        <p id="newsletter-msg" class="form-msg" role="status" aria-live="polite"></p>
+      </form></div>
+  </div>
+  <p class="container debug" id="debug-attrs" data-qa="debug-attrs"></p>
+</footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="../assets/shop.js"></script>
+</body>
+</html>
