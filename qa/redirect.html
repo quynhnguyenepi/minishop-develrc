@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redirect | Mini Shop QA</title>
+<link rel="icon" href="data:,">
+<script>
+/* QA hook: push the "segment" user attribute BEFORE the Optimizely snippet runs.
+   ?segment=vip sets it (stored in a cookie), ?segment=clear removes it. */
+(function () {
+  try {
+    var m, seg = new URLSearchParams(location.search).get('segment');
+    if (seg === 'clear') { document.cookie = 'qa_segment=;path=/;max-age=0'; seg = null; }
+    else if (seg) { document.cookie = 'qa_segment=' + encodeURIComponent(seg) + ';path=/;max-age=86400'; }
+    else if ((m = document.cookie.match(/(?:^|; )qa_segment=([^;]*)/))) { seg = decodeURIComponent(m[1]); }
+    window.optimizely = window.optimizely || [];
+    if (seg) { window.optimizely.push({ type: 'user', attributes: { segment: seg } }); }
+  } catch (e) {}
+})();
+</script>
+<!-- OPTIMIZELY SNIPPET: synchronous, first blocking script after the hook. Project 5185974816735232 (develrc). -->
+<script src="https://optimizely-staging.s3.amazonaws.com/js/5185974816735232.js"></script>
+<script>
+/* CJS-12839 MN-REDIRECT: leaves the shop's site as soon as the snippet has run. A journey hop that lands here
+   must fail as "hop left the target's site". */
+location.replace('https://example.com/');
+</script>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-page="qa-redirect" data-root="../">
+<header class="site-header">
+  <div class="container header-row">
+    <a id="site-logo" class="logo" href="../index.html">Mini<span>Shop</span></a>
+  </div>
+</header>
+<main class="container section">
+  <h1 data-qa="qa-title">Redirect page</h1>
+  <p data-qa="qa-text">QA page for CJS-12839. You should not be able to read this: the page sends the browser to example.com straight away.</p>
+</main>
+</body>
+</html>

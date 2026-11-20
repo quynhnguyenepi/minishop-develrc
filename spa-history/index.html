@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini Shop app (history router) | Mini Shop QA</title>
+<link rel="icon" href="data:,">
+<script>
+/* QA hook: push the "segment" user attribute BEFORE the Optimizely snippet runs.
+   ?segment=vip sets it (stored in a cookie), ?segment=clear removes it. */
+(function () {
+  try {
+    var m, seg = new URLSearchParams(location.search).get('segment');
+    if (seg === 'clear') { document.cookie = 'qa_segment=;path=/;max-age=0'; seg = null; }
+    else if (seg) { document.cookie = 'qa_segment=' + encodeURIComponent(seg) + ';path=/;max-age=86400'; }
+    else if ((m = document.cookie.match(/(?:^|; )qa_segment=([^;]*)/))) { seg = decodeURIComponent(m[1]); }
+    window.optimizely = window.optimizely || [];
+    if (seg) { window.optimizely.push({ type: 'user', attributes: { segment: seg } }); }
+  } catch (e) {}
+})();
+</script>
+<!-- OPTIMIZELY SNIPPET: synchronous, first blocking script after the hook. Project 5185974816735232 (develrc). -->
+<script src="https://optimizely-staging.s3.amazonaws.com/js/5185974816735232.js"></script>
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.spa-nav { display: flex; gap: 18px; align-items: center; }
+.spa-nav a { font-weight: 600; text-decoration: none; }
+.spa-nav a[aria-current="page"] { text-decoration: underline; }
+</style>
+</head>
+<body data-page="qa-spa-history" data-root="../">
+<!-- CJS-12839 MN-SPAHIST. History router (pushState + popstate). Routes are paths under this folder:
+     index.html (home), about, cart. Any other path, or a path outside this folder, draws "Not found".
+     The router listens to popstate ONLY: a location.hash change is ignored on purpose.
+     The about / cart URLs do not exist as files: they are reached by pushState from this page, never by a request. -->
+<div id="app-shell">
+  <header class="site-header">
+    <div class="container header-row">
+      <a id="site-logo" class="logo" href="index.html" data-route="home">Mini<span>Shop</span></a>
+      <nav class="spa-nav" aria-label="App">
+        <a id="nav-home" href="index.html" data-route="home" data-qa="nav-home">Home</a>
+        <a id="nav-about" href="about" data-route="about" data-qa="nav-about">About</a>
+        <a id="nav-cart" href="cart" data-route="cart" data-qa="nav-cart">Cart</a>
+      </nav>
+    </div>
+  </header>
+</div>
+<main id="view" class="container section" data-qa="view"></main>
+<script>
+(function () {
+  'use strict';
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  var base = location.pathname.replace(/[^\/]*$/, '');          // folder of this page, e.g. /minishop/spa-history/
+  var ROUTES = { '': 'home', 'index.html': 'home', 'about': 'about', 'cart': 'cart' };
+  var VIEWS = {
+    home: function () {
+      return '<h1 id="home-title" data-qa="home-title">Welcome to the Mini Shop app</h1>' +
+        '<p data-qa="home-text">This single-page view is drawn by a history router. Use the links above: only this area changes and the address bar path changes with it.</p>';
+    },
+    about: function () {
+      return '<h1 data-qa="about-title">About the app</h1>' +
+        '<p data-qa="about-text">The header above is the app shell. It is never re-rendered, so anything a variation adds to it stays on every route.</p>';
+    },
+    cart: function () {
+      return '<h1 data-qa="cart-title">Your cart</h1>' +
+        '<ul data-qa="cart-list"><li>Runner Pro 1 &times; 1</li><li>Quilted Crossbody &times; 1</li></ul>';
+    }
+  };
+  var view = document.getElementById('view');
+  function currentName() {
+    var p = location.pathname;
+    if (p.indexOf(base) !== 0) { return null; }
+    var rest = p.slice(base.length);
+    return Object.prototype.hasOwnProperty.call(ROUTES, rest) ? ROUTES[rest] : null;
+  }
+  function render() {
+    var name = currentName();
+    view.innerHTML = name ? VIEWS[name]() :
+      '<h1 data-qa="not-found-title">Not found</h1><p data-qa="not-found-text">No view for <code>' + esc(location.pathname) + '</code>.</p>';
+    view.setAttribute('data-route', name || 'not-found');
+    ['home', 'about', 'cart'].forEach(function (n) {
+      var a = document.getElementById('nav-' + n);
+      if (name === n) { a.setAttribute('aria-current', 'page'); } else { a.removeAttribute('aria-current'); }
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-route]'), function (a) {
+    if (a.tagName !== 'A') { return; }
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      history.pushState({}, '', base + a.getAttribute('href'));
+      render();
+    });
+  });
+  window.addEventListener('popstate', render);
+  render();
+})();
+</script>
+</body>
+</html>

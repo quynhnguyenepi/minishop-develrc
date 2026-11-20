@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>No snippet | Mini Shop QA</title>
+<link rel="icon" href="data:,">
+<!-- CJS-12839 MN-NOSNIPPET: same site as the shop, deliberately NO Optimizely snippet and NO script of any kind
+     (shop.js and the segment hook would create window.optimizely). window.optimizely must stay undefined. -->
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-page="qa-nosnippet" data-root="../">
+<header class="site-header">
+  <div class="container header-row">
+    <a id="site-logo" class="logo" href="../index.html">Mini<span>Shop</span></a>
+  </div>
+</header>
+<main class="container section">
+  <h1 data-qa="qa-title">No snippet page</h1>
+  <p data-qa="qa-text">QA page for CJS-12839. This page belongs to the shop site but does not load the Optimizely snippet, so <code>window.optimizely</code> is undefined here.</p>
+  <p><a href="../index.html">Home</a> &middot; <a href="../category.html">Shop</a> &middot; <a href="../checkout.html">Checkout</a></p>
+</main>
+</body>
+</html>

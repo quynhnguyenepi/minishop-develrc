@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini Shop app (hash router) | Mini Shop QA</title>
+<link rel="icon" href="data:,">
+<script>
+/* QA hook: push the "segment" user attribute BEFORE the Optimizely snippet runs.
+   ?segment=vip sets it (stored in a cookie), ?segment=clear removes it. */
+(function () {
+  try {
+    var m, seg = new URLSearchParams(location.search).get('segment');
+    if (seg === 'clear') { document.cookie = 'qa_segment=;path=/;max-age=0'; seg = null; }
+    else if (seg) { document.cookie = 'qa_segment=' + encodeURIComponent(seg) + ';path=/;max-age=86400'; }
+    else if ((m = document.cookie.match(/(?:^|; )qa_segment=([^;]*)/))) { seg = decodeURIComponent(m[1]); }
+    window.optimizely = window.optimizely || [];
+    if (seg) { window.optimizely.push({ type: 'user', attributes: { segment: seg } }); }
+  } catch (e) {}
+})();
+</script>
+<!-- OPTIMIZELY SNIPPET: synchronous, first blocking script after the hook. Project 5185974816735232 (develrc). -->
+<script src="https://optimizely-staging.s3.amazonaws.com/js/5185974816735232.js"></script>
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.spa-nav { display: flex; gap: 18px; align-items: center; }
+.spa-nav a { font-weight: 600; text-decoration: none; }
+.spa-nav a[aria-current="page"] { text-decoration: underline; }
+</style>
+</head>
+<body data-page="qa-spa-hash" data-root="../">
+<!-- CJS-12839 MN-SPA. Hash router. #app-shell is NEVER re-rendered: whatever a variation adds to it
+     (for example the seeded .qa-banner) stays on every route. Only #view is re-drawn on each route.
+     Routes: #/home  #/about  #/cart.  Any other route (for example #/opti-qa-away) draws a "Not found" view,
+     so the visible content really changes and the QA agent counts the route as driven.
+     The router listens to hashchange ONLY: a pushState + popstate hop is ignored on purpose (TC-22). -->
+<div id="app-shell">
+  <header class="site-header">
+    <div class="container header-row">
+      <a id="site-logo" class="logo" href="#/home">Mini<span>Shop</span></a>
+      <nav class="spa-nav" aria-label="App">
+        <a id="nav-home" href="#/home" data-qa="nav-home">Home</a>
+        <a id="nav-about" href="#/about" data-qa="nav-about">About</a>
+        <a id="nav-cart" href="#/cart" data-qa="nav-cart">Cart</a>
+      </nav>
+    </div>
+  </header>
+</div>
+<main id="view" class="container section" data-qa="view"></main>
+<script>
+(function () {
+  'use strict';
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  var VIEWS = {
+    '#/home': function () {
+      return '<h1 id="home-title" data-qa="home-title">Welcome to the Mini Shop app</h1>' +
+        '<p data-qa="home-text">This single-page view is drawn by a hash router. Use the links above: only this area changes.</p>';
+    },
+    '#/about': function () {
+      return '<h1 data-qa="about-title">About the app</h1>' +
+        '<p data-qa="about-text">The header above is the app shell. It is never re-rendered, so anything a variation adds to it stays on every route.</p>';
+    },
+    '#/cart': function () {
+      return '<h1 data-qa="cart-title">Your cart</h1>' +
+        '<ul data-qa="cart-list"><li>Runner Pro 1 &times; 1</li><li>Quilted Crossbody &times; 1</li></ul>';
+    }
+  };
+  var view = document.getElementById('view');
+  function render() {
+    var key = location.hash.replace(/\?.*$/, '') || '#/home';   // "#/about?x=1" is the "#/about" route
+    var draw = VIEWS[key];
+    view.innerHTML = draw ? draw() :
+      '<h1 data-qa="not-found-title">Not found</h1><p data-qa="not-found-text">No view for <code>' + esc(location.hash) + '</code>.</p>';
+    view.setAttribute('data-route', draw ? key : 'not-found');
+    ['home', 'about', 'cart'].forEach(function (n) {
+      var a = document.getElementById('nav-' + n);
+      if (key === '#/' + n) { a.setAttribute('aria-current', 'page'); } else { a.removeAttribute('aria-current'); }
+    });
+  }
+  window.addEventListener('hashchange', render);
+  render();
+})();
+</script>
+</body>
+</html>

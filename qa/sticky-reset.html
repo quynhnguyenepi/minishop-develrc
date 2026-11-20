@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sticky reset | Mini Shop QA</title>
+<link rel="icon" href="data:,">
+<script>
+/* CJS-12839 negative control (MN-RESET). Runs BEFORE the Optimizely snippet: it deletes every cookie
+   and every localStorage / sessionStorage key whose name starts with "optimizely", so the snippet below
+   sees a brand-new visitor and the visitor the QA agent was following is replaced. */
+(function () {
+  try {
+    var host = location.hostname;
+    var domains = [null, host, '.' + host];
+    document.cookie.split(';').forEach(function (c) {
+      var name = c.split('=')[0].trim();
+      if (name.indexOf('optimizely') !== 0) { return; }
+      domains.forEach(function (d) {
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + (d ? ';domain=' + d : '');
+      });
+    });
+    [window.localStorage, window.sessionStorage].forEach(function (store) {
+      Object.keys(store).forEach(function (k) { if (k.indexOf('optimizely') === 0) { store.removeItem(k); } });
+    });
+  } catch (e) {}
+})();
+</script>
+<script>
+/* QA hook: push the "segment" user attribute BEFORE the Optimizely snippet runs.
+   ?segment=vip sets it (stored in a cookie), ?segment=clear removes it. */
+(function () {
+  try {
+    var m, seg = new URLSearchParams(location.search).get('segment');
+    if (seg === 'clear') { document.cookie = 'qa_segment=;path=/;max-age=0'; seg = null; }
+    else if (seg) { document.cookie = 'qa_segment=' + encodeURIComponent(seg) + ';path=/;max-age=86400'; }
+    else if ((m = document.cookie.match(/(?:^|; )qa_segment=([^;]*)/))) { seg = decodeURIComponent(m[1]); }
+    window.optimizely = window.optimizely || [];
+    if (seg) { window.optimizely.push({ type: 'user', attributes: { segment: seg } }); }
+  } catch (e) {}
+})();
+</script>
+<!-- OPTIMIZELY SNIPPET: synchronous, first blocking script after the hooks. Project 5185974816735232 (develrc). -->
+<script src="https://optimizely-staging.s3.amazonaws.com/js/5185974816735232.js"></script>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body data-page="qa-sticky-reset" data-root="../">
+<header class="site-header">
+  <div class="container header-row">
+    <a id="site-logo" class="logo" href="../index.html">Mini<span>Shop</span></a>
+  </div>
+</header>
+<main class="container section">
+  <h1 data-qa="qa-title">Sticky reset page</h1>
+  <p data-qa="qa-text">QA page for CJS-12839. Before the Optimizely snippet runs, this page deletes the visitor cookie and every <code>optimizely*</code> storage key, so the next decision is a new visitor's. A journey that reaches this page must be reported as a lost visitor or a flipped variation.</p>
+  <p><a href="../index.html">Home</a> &middot; <a href="../category.html">Shop</a> &middot; <a href="../checkout.html">Checkout</a></p>
+</main>
+</body>
+</html>
